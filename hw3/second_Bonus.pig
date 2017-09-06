@@ -1,0 +1,10 @@
+a = LOAD 'inputfile/kids.txt' USING PigStorage(' ') AS (name:chararray, age:int);
+b = FILTER a BY (age == 10 OR age == 11 OR age == 12);
+c = LOAD 'inputfile/purchases.txt' USING PigStorage(' ') AS (name:chararray, flavor:chararray);
+d = JOIN b BY name, c BY name;
+e = GROUP d BY flavor;
+f = FOREACH e GENERATE group, COUNT(d) AS sale;
+g = GROUP f ALL;
+h = FOREACH g GENERATE MAX(f.sale) AS val;
+i = FILTER f BY sale == (long)h.val;
+STORE i INTO 'outputfile' USING PigStorage();
